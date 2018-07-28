@@ -1,8 +1,8 @@
 spring:
   cloud:
     stream:
-      default:
-        contentType: application/json
+#      default:
+#        contentType: application/json
       kafka:
         binder:
           brokers: localhost:9092

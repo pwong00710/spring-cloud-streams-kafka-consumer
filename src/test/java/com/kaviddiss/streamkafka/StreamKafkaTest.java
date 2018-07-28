@@ -33,29 +33,21 @@ public class StreamKafkaTest {
     
     @Test
     public void testGreeting() throws Exception {
-        String name = "Peter";
-        String message = "hello";
-        
-        Greetings greetings = new Greetings();
-        greetings.setId(Greetings.nextId());
-        greetings.setTxnId(Greetings.nextTxnId());
-        greetings.setName(name);
-        greetings.setMessage(message);
-        greetings.setTimestamp(System.currentTimeMillis());
+        // given
+        Greetings greetings = Greetings.builder().name("Peter").message("hello").build();
 
+        // when
         log.info("Sending greetings {}", greetings);
-
         helloStreams.inboundGreetings().send(MessageBuilder
                 .withPayload(greetings)
                 .build());
 
+        // then
         Message<String> received = (Message<String>) messageCollector.forChannel(helloStreams.outboundGoodbyes()).poll();
-
         Goodbyes goodbyes = objectMapper.readValue(received.getPayload(), Goodbyes.class);
         
         Assert.assertNotNull(goodbyes);
         log.info("Received goodbyes: {}", goodbyes);
-        
         Assert.assertEquals(goodbyes.getRefTxnId(), greetings.getTxnId());
     }
 }

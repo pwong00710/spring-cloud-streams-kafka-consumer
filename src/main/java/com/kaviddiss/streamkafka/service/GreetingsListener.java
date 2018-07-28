@@ -19,30 +19,23 @@ import org.springframework.util.MimeTypeUtils;
 @Slf4j
 public class GreetingsListener {
     @Autowired
-    private GreetingsStreams greetingsStreams;
-
-    @Autowired
-    private GoodbyesStreams goodbyesStreams;
+    private HelloStreams helloStreams;
     
-    @StreamListener(HelloStreams.INPUT)
-    @SendTo(HelloStreams.OUTPUT)
-    public Goodbyes handleGreetings(@Payload Greetings greetings) {
+    @StreamListener(target = HelloStreams.INPUT, condition = "headers['type']=='greetings'")
+//    @SendTo(HelloStreams.OUTPUT)
+    public void handleGreetings(@Payload Greetings greetings) {
         log.info("Received greetings: {}", greetings);
-//        Goodbyes goodbyes = Goodbyes.builder()
-//                .id(Goodbyes.nextId())
-//                .name(greetings.getName())
-//                .message(greetings.getMessage())
-//                .timestamp(System.currentTimeMillis())
-//                .refTxnId(greetings.getTxnId())
-//                .build();
-        Goodbyes goodbyes = new Goodbyes();
-        goodbyes.setId(Goodbyes.nextId());
-        goodbyes.setName(greetings.getName());
-        goodbyes.setMessage(greetings.getMessage());
-        goodbyes.setTimestamp(System.currentTimeMillis());
-        goodbyes.setRefTxnId(greetings.getTxnId());
-        
+        Goodbyes goodbyes = Goodbyes.builder()
+                .name(greetings.getName())
+                .message(greetings.getMessage())
+                .refTxnId(greetings.getTxnId())
+                .build();
+ 
         log.info("Sending goodbyes {}", goodbyes);
-        return goodbyes;
+        helloStreams.outboundGoodbyes().send(MessageBuilder
+                .withPayload(goodbyes)
+                .setHeader("type", "goodbyes")
+                .build());
+//        return goodbyes;
     }
 }
