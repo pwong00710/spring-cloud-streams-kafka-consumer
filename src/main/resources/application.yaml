@@ -1,0 +1,29 @@
+spring:
+  cloud:
+    stream:
+      default:
+        contentType: application/json
+      kafka:
+        binder:
+          brokers: localhost:9092
+          autoAddPartitions: true
+      bindings:
+        greetings-in:
+          destination: greetings
+#          contentType: application/json
+          consumer:
+            autoRebalanceEnabled: false
+            partitioned: true
+          group: greetingConsumers
+        goodbyes-out:
+          destination: goodbyes
+#          contentType: application/json
+          producer:
+            partitionKeyExpression: payload.partitionId
+            partitionCount: ${CONSUMER_INSTANCE_COUNT:2}          
+      instanceCount: ${CONSUMER_INSTANCE_COUNT:2}
+      instanceIndex: ${CONSUMER_INSTANCE_INDEX:0}
+#server:
+#  port: 8090
+
+#spring.cloud.stream.default.contentType=application/json
