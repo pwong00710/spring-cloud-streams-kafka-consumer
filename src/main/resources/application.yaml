@@ -5,14 +5,17 @@ spring:
 #        contentType: application/json
       kafka:
         binder:
-          brokers: localhost:9092
+          brokers: ${KAFKA_HOSTNAME:localhost}:9092
           autoAddPartitions: true
+        bindings: 
+          greetings-in:
+            consumer:
+             autoRebalanceEnabled: false          
       bindings:
         greetings-in:
           destination: greetings
 #          contentType: application/json
           consumer:
-            autoRebalanceEnabled: false
             partitioned: true
           group: greetingConsumers
         goodbyes-out:
